@@ -2,17 +2,17 @@ name: Import SaaS template
 
 on:
   push:
-    branches: [main]
+    branches: [setup/saas-template]
 
 permissions:
   contents: write
 
 jobs:
   import-template:
-    if: github.event.head_commit.message == 'Bootstrap clean SaaS template import'
+    if: github.event.head_commit.message == 'Run clean SaaS template import'
     runs-on: ubuntu-latest
     steps:
-      - name: Check out CostaPulseCrew
+      - name: Check out import branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -22,11 +22,10 @@ jobs:
           git clone --depth 1 https://github.com/ixartz/SaaS-Boilerplate.git /tmp/saas-template
           rm -rf /tmp/saas-template/.git
 
-      - name: Create clean import branch
+      - name: Replace branch contents with template
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -c setup/saas-template
           find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
           cp -a /tmp/saas-template/. .
           git add -A
