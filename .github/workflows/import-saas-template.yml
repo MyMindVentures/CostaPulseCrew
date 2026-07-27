@@ -1,0 +1,34 @@
+name: Import SaaS template
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  import-template:
+    if: github.event.head_commit.message == 'Bootstrap clean SaaS template import'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out CostaPulseCrew
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download free MIT SaaS template
+        run: |
+          git clone --depth 1 https://github.com/ixartz/SaaS-Boilerplate.git /tmp/saas-template
+          rm -rf /tmp/saas-template/.git
+
+      - name: Create clean import branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c setup/saas-template
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a /tmp/saas-template/. .
+          git add -A
+          git commit -m "Import ixartz SaaS Boilerplate as clean project base"
+          git push origin setup/saas-template
