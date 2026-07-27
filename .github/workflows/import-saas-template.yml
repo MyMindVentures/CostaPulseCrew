@@ -1,16 +1,15 @@
 name: Import SaaS template
 
 on:
-  pull_request:
-    branches: [main]
-    types: [opened, synchronize, reopened]
+  push:
+    branches: [setup/saas-template]
 
 permissions:
   contents: write
 
 jobs:
   import-template:
-    if: github.head_ref == 'setup/saas-template'
+    if: github.event.head_commit.message == 'Run clean SaaS template import'
     runs-on: ubuntu-latest
     steps:
       - name: Check out import branch
