@@ -15,6 +15,7 @@ jobs:
       - name: Check out import branch
         uses: actions/checkout@v4
         with:
+          ref: setup/saas-template
           fetch-depth: 0
 
       - name: Download free MIT SaaS template
