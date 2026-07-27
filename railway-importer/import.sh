@@ -45,6 +45,10 @@ echo "Cloning source $SOURCE_REPO_URL at ref $SOURCE_REF..."
 git clone --depth 1 --branch "$SOURCE_REF" "$SOURCE_REPO_URL" "$SOURCE_DIR"
 rm -rf "$SOURCE_DIR/.git"
 
+# Remove GitHub Actions workflows from the imported template. This keeps the
+# target repository workflow-free and avoids requiring a token with workflow scope.
+rm -rf "$SOURCE_DIR/.github/workflows"
+
 echo "Cloning target $TARGET_REPO at base branch $TARGET_BASE_BRANCH..."
 git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $AUTH_HEADER" \
   clone --depth 1 --branch "$TARGET_BASE_BRANCH" "$TARGET_URL" "$TARGET_DIR"
@@ -54,6 +58,9 @@ git switch -C "$TARGET_BRANCH"
 
 find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
 cp -a "$SOURCE_DIR/." .
+
+# Defensive cleanup in case workflows were introduced by another source path.
+rm -rf .github/workflows
 
 git config user.name "$GIT_AUTHOR_NAME"
 git config user.email "$GIT_AUTHOR_EMAIL"
